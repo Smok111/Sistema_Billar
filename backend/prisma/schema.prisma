@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model CategoriasProductos {
+  IdCategoria Int         @id(map: "PK_CategoriasProductos") @default(autoincrement())
+  Nombre      String      @db.VarChar(50)
+  Productos   Productos[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Clientes {
+  IdCliente     Int        @id(map: "PK_Clientes") @default(autoincrement())
+  Nombre        String     @db.VarChar(100)
+  Telefono      String     @db.VarChar(9)
+  Email         String?    @db.VarChar(100)
+  Direccion     String?    @db.VarChar(200)
+  FechaRegistro DateTime   @db.Timestamptz(6)
+  Consumos      Consumos[]
+  Reservas      Reservas[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ConsumoDetalles {
+  IdDetalle      Int       @id(map: "PK_ConsumoDetalles") @default(autoincrement())
+  IdConsumo      Int
+  IdProducto     Int
+  Cantidad       Int
+  PrecioUnitario Decimal   @db.Decimal(18, 2)
+  FechaRegistro  DateTime  @db.Timestamptz(6)
+  Consumos       Consumos  @relation(fields: [IdConsumo], references: [IdConsumo], onDelete: Cascade, onUpdate: NoAction, map: "FK_ConsumoDetalles_Consumos_IdConsumo")
+  Productos      Productos @relation(fields: [IdProducto], references: [IdProducto], onUpdate: NoAction, map: "FK_ConsumoDetalles_Productos_IdProducto")
+
+  @@index([IdConsumo], map: "IX_ConsumoDetalles_IdConsumo")
+  @@index([IdProducto], map: "IX_ConsumoDetalles_IdProducto")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Consumos {
+  IdConsumo            Int               @id(map: "PK_Consumos") @default(autoincrement())
+  IdMesa               Int
+  IdCliente            Int
+  FechaInicio          DateTime          @db.Timestamptz(6)
+  FechaFin             DateTime?         @db.Timestamptz(6)
+  Estado               String
+  IdUsuario            Int
+  TipoCobro            String            @db.VarChar(20)
+  PrecioHora           Decimal           @db.Decimal(18, 2)
+  PrecioMediaHora      Decimal           @db.Decimal(18, 2)
+  PrecioLibrePorMinuto Decimal           @db.Decimal(18, 2)
+  MinutosJugados       Int?
+  CostoMesa            Decimal           @db.Decimal(18, 2)
+  TotalProductos       Decimal           @db.Decimal(18, 2)
+  Total                Decimal           @db.Decimal(18, 2)
+  ConsumoDetalles      ConsumoDetalles[]
+  Clientes             Clientes          @relation(fields: [IdCliente], references: [IdCliente], onDelete: Cascade, onUpdate: NoAction, map: "FK_Consumos_Clientes_IdCliente")
+  Mesas                Mesas             @relation(fields: [IdMesa], references: [IdMesa], onUpdate: NoAction, map: "FK_Consumos_Mesas_IdMesa")
+  Usuarios             Usuarios          @relation(fields: [IdUsuario], references: [IdUsuario], onUpdate: NoAction, map: "FK_Consumos_Usuarios_IdUsuario")
+
+  @@index([IdCliente], map: "IX_Consumos_IdCliente")
+  @@index([IdMesa], map: "IX_Consumos_IdMesa")
+  @@index([IdUsuario], map: "IX_Consumos_IdUsuario")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Mesas {
+  IdMesa     Int        @id(map: "PK_Mesas") @default(autoincrement())
+  NumeroMesa Int        @unique(map: "IX_Mesas_NumeroMesa")
+  Estado     String     @db.VarChar(50)
+  Consumos   Consumos[]
+  Reservas   Reservas[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Productos {
+  IdProducto          Int                 @id(map: "PK_Productos") @default(autoincrement())
+  Nombre              String              @db.VarChar(100)
+  Precio              Decimal             @db.Decimal(18, 2)
+  IdCategoria         Int
+  ImagenUrl           String?             @db.VarChar(250)
+  ConsumoDetalles     ConsumoDetalles[]
+  CategoriasProductos CategoriasProductos @relation(fields: [IdCategoria], references: [IdCategoria], onUpdate: NoAction, map: "FK_Productos_CategoriasProductos_IdCategoria")
+
+  @@index([IdCategoria], map: "IX_Productos_IdCategoria")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Reservas {
+  IdReserva            Int                     @id(map: "PK_Reservas") @default(autoincrement())
+  FechaReserva         DateTime                @db.Timestamptz(6)
+  HoraInicio           String
+  HoraFin              String
+  FechaHoraInicioJuego DateTime?               @db.Timestamptz(6)
+  FechaHoraFinJuego    DateTime?               @db.Timestamptz(6)
+  IdMesa               Int
+  IdCliente            Int
+  Estado               String                  @db.VarChar(20)
+  Observaciones        String?                 @db.VarChar(500)
+  NumeroPersonas       Int
+  Clientes             Clientes                @relation(fields: [IdCliente], references: [IdCliente], onUpdate: NoAction, map: "FK_Reservas_Clientes_IdCliente")
+  Mesas                Mesas                   @relation(fields: [IdMesa], references: [IdMesa], onUpdate: NoAction, map: "FK_Reservas_Mesas_IdMesa")
+
+  @@index([IdCliente], map: "IX_Reservas_IdCliente")
+  @@index([IdMesa], map: "IX_Reservas_IdMesa")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Roles {
+  IdRol    Int        @id(map: "PK_Roles") @default(autoincrement())
+  NomRol   String     @unique(map: "IX_Roles_NomRol") @db.VarChar(20)
+  DesRol   String     @db.VarChar(200)
+  Permisos String     @default("[]") @db.Text
+  Usuarios Usuarios[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Usuarios {
+  IdUsuario  Int        @id(map: "PK_Usuarios") @default(autoincrement())
+  NomUsuario String     @db.VarChar(50)
+  ApeUsuario String     @db.VarChar(50)
+  Correo     String     @unique(map: "IX_Usuarios_Correo") @db.VarChar(50)
+  Password   String     @db.VarChar(100)
+  IdRol      Int
+  Consumos   Consumos[]
+  Roles      Roles      @relation(fields: [IdRol], references: [IdRol], onUpdate: NoAction, map: "FK_Usuarios_Roles_IdRol")
+
+  @@index([IdRol], map: "IX_Usuarios_IdRol")
+}
+
+model EFMigrationsHistory {
+  MigrationId    String @id(map: "PK___EFMigrationsHistory") @db.VarChar(150)
+  ProductVersion String @db.VarChar(32)
+
+  @@map("__EFMigrationsHistory")
+}
