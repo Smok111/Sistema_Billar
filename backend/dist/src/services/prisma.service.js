@@ -51,12 +51,9 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     constructor() {
+        const connectionString = process.env.DATABASE_URL || '';
         const pool = new pg_1.Pool({
-            host: 'db.qjtrakwqgklelgojelyc.supabase.co',
-            port: 5432,
-            user: 'postgres',
-            password: 'ERMT5!Dkzt.DD6c',
-            database: 'postgres',
+            connectionString,
             ssl: { rejectUnauthorized: false }
         });
         const adapter = new adapter_pg_1.PrismaPg(pool);
