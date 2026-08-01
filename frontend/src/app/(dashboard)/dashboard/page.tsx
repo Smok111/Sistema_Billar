@@ -291,7 +291,7 @@ export default function DashboardPage() {
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14, fontWeight: 600}} tickFormatter={(value) => `S/${value}`} />
                 <RechartsTooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontSize: '15px', fontWeight: 600 }}
-                  formatter={(value: number) => [`S/ ${value.toFixed(2)}`, 'Ingresos']}
+                  formatter={(value: any) => [`S/ ${Number(value).toFixed(2)}`, 'Ingresos']}
                   labelStyle={{ fontWeight: 'bold', color: '#1e293b', marginBottom: '4px', fontSize: '14px' }}
                 />
                 <Area type="monotone" dataKey="total" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorTotal)" activeDot={{ r: 8, strokeWidth: 3, stroke: '#fff', fill: '#10b981' }} />
